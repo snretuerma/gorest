@@ -6,16 +6,17 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	blog "github.com/snretuerma/gorest/controller/blog"
 )
 
-func initHandlers() {
-	router.Get("/api/posts", controller.GetAllPosts)
-}
+// func initHandlers() {
+// 	router.Get("/api/posts", controller.GetAllPosts)
+// }
 
 func Start() {
 	router := chi.NewRouter()
 
-	initHandlers()
-	fmt.Printf("router initialized and listening on 3200\n")
+	router.Get("/api/posts", blog.GetAllPosts)
+	fmt.Printf("Router initialized and listening on 3200\n")
 	log.Fatal(http.ListenAndServe(":3200", router))
 }

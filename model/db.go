@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"time"
 
-	zlog "github.com/rs/zerolog/log"
+	"github.com/joho/godotenv"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -15,6 +15,8 @@ import (
 var db *gorm.DB
 
 func init() {
+	err := godotenv.Load("config/.env")
+
 	var (
 		DBCONN = os.Getenv("POSTGRES_URL")
 		DBNAME = os.Getenv("POSTGRES_DB")
@@ -22,17 +24,22 @@ func init() {
 		DBUSER = os.Getenv("POSTGRES_USER")
 		DBPASS = os.Getenv("POSTGRES_PASSWORD")
 	)
+	fmt.Printf("Connecting to PostgresQL %s %s", DBCONN, DBNAME)
 
-	zlog.Info().Msgf("Connecting to PostgresQL %s %s", DBCONN, DBNAME)
-	var err error
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True",
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Manila",
+		DBCONN,
 		DBUSER,
 		DBPASS,
-		DBCONN,
-		DBPORT,
 		DBNAME,
+		DBPORT,
 	)
+	fmt.Printf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Manila",
+		DBCONN,
+		DBUSER,
+		DBPASS,
+		DBNAME,
+		DBPORT)
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags),
@@ -43,15 +50,16 @@ func init() {
 	})
 
 	if err != nil {
-		zlog.Fatal().Msgf("Failed to connect to database: %v", err)
+		fmt.Printf("Error connecting to the DB: %s\n", err.Error())
 	}
 
-	psqlDB, err := db.DB()
+	sqlDB, err := db.DB()
 	if err != nil {
-		zlog.Fatal.Msgf("Unable to ping database %s %s", DBCONN, DBNAME)
+		fmt.Printf("Error could not ping database: %s\n", err.Error())
 	}
+	sqlDB.Ping()
 
-	psqlDB.SetMaxIdleConns(3)
-	psqlDB.SetMaxOpenConns(1)
-	psqlDB.SetMaxConnMaxLifetime(time.Hour)
+	// psqlDB.SetMaxIdleConns(3)
+	// psqlDB.SetMaxOpenConns(1)
+	// psqlDB.SetMaxConnMaxLifetime(time.Hour)
 }

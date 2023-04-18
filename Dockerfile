@@ -6,7 +6,13 @@ WORKDIR /var/www
 
 COPY . /var/www
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+
+RUN go mod init github.com/snretuerma/gorest
+
+RUN go mod tidy
+
+RUN go build -o app
 
 EXPOSE 3200
 

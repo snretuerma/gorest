@@ -3,6 +3,8 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/snretuerma/gorest/model"
 )
 
 func GetAllPosts(w http.ResponseWriter, r *http.Request) {
