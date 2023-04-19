@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 
@@ -13,6 +14,15 @@ import (
 )
 
 var db *gorm.DB
+
+type Post struct {
+	Id        uint64         `gorm:"primaryKey json:"id"`
+	Title     string         `json:"title"`
+	Content   string         `json:"content"`
+	CreatedAt time.Time      `gorm:"<-:create" json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"deleted_at"`
+}
 
 func init() {
 	err := godotenv.Load("config/.env")
@@ -34,12 +44,7 @@ func init() {
 		DBNAME,
 		DBPORT,
 	)
-	fmt.Printf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Manila",
-		DBCONN,
-		DBUSER,
-		DBPASS,
-		DBNAME,
-		DBPORT)
+
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags),
@@ -58,8 +63,5 @@ func init() {
 		fmt.Printf("Error could not ping database: %s\n", err.Error())
 	}
 	sqlDB.Ping()
-
-	// psqlDB.SetMaxIdleConns(3)
-	// psqlDB.SetMaxOpenConns(1)
-	// psqlDB.SetMaxConnMaxLifetime(time.Hour)
+	db.AutoMigrate(&Post{})
 }

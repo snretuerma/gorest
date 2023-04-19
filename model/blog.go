@@ -1,29 +1,58 @@
 package model
 
-import "time"
-
-type GenericModel struct {
-	Id        int       `gorm:"primaryKey" json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-	DeletedAt time.Time `json:"deleted_at"`
-}
-
-type Post struct {
-	GenericModel
-	Id      uint64 `json:"id"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}
-
 func GetAllPosts() ([]Post, error) {
-	var post []Post
+	var posts []Post
 
-	tx := db.Find(&post)
+	tx := db.Find(&posts)
+
+	if tx.Error != nil {
+		return posts, tx.Error
+	}
+
+	return posts, nil
+}
+
+func GetPost(id string) (Post, error) {
+	var post Post
+
+	tx := db.First(&post, id)
 
 	if tx.Error != nil {
 		return post, tx.Error
 	}
 
 	return post, nil
+}
+
+func CreatePost(post Post) error {
+
+	result := db.Create(&post)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func UpdatePost(post Post) error {
+	result := db.Save(&post)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	return nil
+}
+
+func DeletePost(id uint64) error {
+	var post Post
+
+	tx := db.Delete(&post, id)
+
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
 }
