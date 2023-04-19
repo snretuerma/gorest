@@ -34,7 +34,7 @@ func init() {
 		DBUSER = os.Getenv("POSTGRES_USER")
 		DBPASS = os.Getenv("POSTGRES_PASSWORD")
 	)
-	fmt.Printf("Connecting to PostgresQL %s %s", DBCONN, DBNAME)
+	fmt.Printf("Connecting to PostgresQL %s %s\n", DBCONN, DBNAME)
 
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Manila",

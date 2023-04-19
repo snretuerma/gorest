@@ -9,10 +9,6 @@ import (
 	blog "github.com/snretuerma/gorest/controller/blog"
 )
 
-// func initHandlers() {
-// 	router.Get("/api/posts", controller.GetAllPosts)
-// }
-
 func Start() {
 	router := chi.NewRouter()
 
