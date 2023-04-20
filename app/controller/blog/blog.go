@@ -15,8 +15,7 @@ func GetAllPosts(w http.ResponseWriter, r *http.Request) {
 	posts, err := model.GetAllPosts()
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		writeError(w, err)
 		return
 	} else {
 		json.NewEncoder(w).Encode(posts)
@@ -31,8 +30,7 @@ func GetPost(w http.ResponseWriter, r *http.Request) {
 	post, err := model.GetPost(idParam)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		writeError(w, err)
 		return
 	} else {
 		json.NewEncoder(w).Encode(post)
@@ -49,16 +47,14 @@ func CreatePost(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&post)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		writeError(w, err)
 		return
 	}
 
 	err = model.CreatePost(post)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		writeError(w, err)
 		return
 	} else {
 		w.WriteHeader(http.StatusOK)
@@ -71,8 +67,7 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 	idParam, err := strconv.ParseUint(string(chi.URLParam(r, "id")), 10, 64)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		writeError(w, err)
 		return
 	}
 
@@ -80,21 +75,17 @@ func UpdatePost(w http.ResponseWriter, r *http.Request) {
 
 	var post model.Post
 
-	post.Id = idParam
-
 	err = decoder.Decode(&post)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		writeError(w, err)
 		return
 	}
 
-	err = model.UpdatePost(post)
+	err = model.UpdatePost(idParam, post)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		writeError(w, err)
 		return
 	} else {
 		w.WriteHeader(http.StatusOK)
@@ -107,19 +98,22 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 	idParam, err := strconv.ParseUint(string(chi.URLParam(r, "id")), 10, 64)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		writeError(w, err)
 		return
 	}
 
 	err = model.DeletePost(idParam)
 
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
+		writeError(w, err)
 		return
 	} else {
 		json.NewEncoder(w).Encode(http.StatusOK)
 	}
 
+}
+
+func writeError(w http.ResponseWriter, err error) {
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write([]byte(err.Error()))
 }

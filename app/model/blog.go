@@ -35,8 +35,17 @@ func CreatePost(post Post) error {
 	return nil
 }
 
-func UpdatePost(post Post) error {
-	result := db.Save(&post)
+func UpdatePost(id uint64, request Post) error {
+
+	var post Post
+
+	tx := db.First(&post, id)
+
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	result := db.Model(&post).Updates(&request)
 
 	if result.Error != nil {
 		return result.Error
